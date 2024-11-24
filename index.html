@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* Base Styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    width: 100%;
+    height: 100vh;
+    background-color: #111827;
+    position: relative;
+}
+
+.video-window {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.video-content {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Compass Styles */
+.compass-container {
+    width: 120px;
+    height: 120px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+}
+
+.compass {
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 26, 26, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.compass-ring {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.compass-heading {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 10px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.compass-marks {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.compass-mark {
+    position: absolute;
+    width: 1px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.3);
+    left: 50%;
+    transform-origin: 50% 50px;
+}
+
+.cardinal-mark {
+    position: absolute;
+    transform-origin: 50% 50px;
+    width: 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.direction-pointer {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 15px solid #FFC107;
+    filter: drop-shadow(0 0 5px rgba(255, 193, 7, 0.5));
+}
+
+.center-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    background: #FFC107;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+}
+
+/* Speedometer Styles */
+.speedometer-container {
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 10;
+}
+
+.speedometer {
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 26, 26, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.speed-dial {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.speed-marks {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.speed-mark {
+    position: absolute;
+    width: 2px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    left: 50%;
+    transform-origin: 50% 60px;
+}
+
+.speed-value {
+    font-size: 36px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.speed-unit {
+    position: absolute;
+    bottom: 30px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.speed-indicator {
+    position: absolute;
+    width: 4px;
+    height: 50px;
+    background: linear-gradient(to bottom, #FFC107 50%, transparent 50%);
+    left: 50%;
+    transform-origin: 50% 100%;
+    bottom: 50%;
+    border-radius: 2px;
+    filter: drop-shadow(0 0 2px rgba(255, 193, 7, 0.5));
+}
+
+/* Altitude Styles */
+.altitude-container {
+    width: 200px;
+    height: 100px;
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    z-index: 10;
+}
+
+.altitude-graph {
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 26, 26, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.graph-content {
+    flex: 1;
+    position: relative;
+    margin-right: 30px;
+}
+
+.graph-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.altitude-labels {
+    position: absolute;
+    right: 5px;
+    top: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 5px 0;
+}
+
+.label {
+    line-height: 1;
+    text-align: right;
+}
+
+.grid-line {
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 1;
+}
+
+.altitude-path {
+    fill: none;
+    stroke: #4CD964;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 2px rgba(76, 217, 100, 0.3));
+}
+
+.altitude-fill {
+    fill: url(#altitudeGradient);
+    opacity: 0.2;
+}
+
+.current-value {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.altitude-marker {
+    position: absolute;
+    right: 0;
+    width: 2px;
+    height: 10px;
+    background: #FFC107;
+    border-radius: 1px;
+    transform: translateY(-50%);
+    box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- Video Component -->
+    <div class="video-window">
+        <video class="video-content" autoplay loop muted playsinline>
+            <source src="DroneFootage5.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+    
+    <!-- Compass Component -->
+    <div class="compass-container">
+        <div class="compass">
+            <div class="compass-ring"></div>
+            <div class="compass-heading">220°</div>
+            <div class="compass-marks" id="compassMarks">
+                <div class="direction-pointer"></div>
+            </div>
+            <div class="center-dot"></div>
+        </div>
+    </div>
+
+    <!-- Speedometer Component -->
+    <div class="speedometer-container">
+        <div class="speedometer">
+            <div class="speed-dial">
+                <div id="speedMarks"></div>
+                <div class="speed-indicator"></div>
+                <div class="speed-value">37</div>
+                <div class="speed-unit">km/h</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Altitude Component -->
+    <div class="altitude-container">
+        <div class="altitude-graph">
+            <div class="graph-content">
+                <svg class="graph-svg" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="altitudeGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="rgb(76, 217, 100)" stop-opacity="0.3"/>
+                            <stop offset="100%" stop-color="rgb(76, 217, 100)" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                    
+                    <line class="grid-line" x1="0%" y1="20%" x2="100%" y2="20%" />
+                    <line class="grid-line" x1="0%" y1="40%" x2="100%" y2="40%" />
+                    <line class="grid-line" x1="0%" y1="60%" x2="100%" y2="60%" />
+                    <line class="grid-line" x1="0%" y1="80%" x2="100%" y2="80%" />
+                    
+                    <path id="altitudePath" class="altitude-path" />
+                    <path id="altitudeFill" class="altitude-fill" />
+                </svg>
+            </div>
+            
+            <div class="altitude-labels">
+                <div class="label">800m</div>
+                <div class="label">600m</div>
+                <div class="label">400m</div>
+                <div class="label">200m</div>
+                <div class="label">0m</div>
+            </div>
+            
+            <div id="altitudeMarker" class="altitude-marker"></div>
+            <div id="currentAltitude" class="current-value">706m</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize compass
+const compassMarks = document.getElementById('compassMarks');
+
+// Create compass marks
+for (let i = 0; i < 360; i += 30) {
+    const mark = document.createElement('div');
+    mark.className = 'compass-mark';
+    mark.style.transform = `rotate(${i}deg)`;
+    
+    if (i % 90 === 0) {
+        mark.style.height = '8px';
+        mark.style.background = 'rgba(255, 255, 255, 0.6)';
+    }
+    
+    compassMarks.appendChild(mark);
+}
+
+// Add cardinal directions
+const cardinals = [
+    { dir: 'N', deg: 0 },
+    { dir: 'E', deg: 90 },
+    { dir: 'S', deg: 180 },
+    { dir: 'W', deg: 270 }
+];
+
+cardinals.forEach(({dir, deg}) => {
+    const cardinal = document.createElement('div');
+    cardinal.className = 'cardinal-mark';
+    cardinal.textContent = dir;
+    cardinal.style.transform = `rotate(${deg}deg) translate(-50%, -40px)`;
+    compassMarks.appendChild(cardinal);
+});
+
+// Initialize speedometer
+const speedMarks = document.getElementById('speedMarks');
+for (let i = 0; i < 60; i++) {
+    const mark = document.createElement('div');
+    mark.className = 'speed-mark';
+    mark.style.transform = `rotate(${i * 6}deg)`;
+    if (i % 5 === 0) {
+        mark.style.height = '12px';
+        mark.style.background = 'rgba(255, 255, 255, 0.6)';
+    }
+    speedMarks.appendChild(mark);
+}
+
+// Animation variables
+let heading = 220;
+let speed = 37;
+let altitude = 706;
+
+// Animation variables for smooth transitions
+let targetHeading = heading;
+let targetSpeed = speed;
+let targetAltitude = altitude;
+
+// Generate altitude path
+function generateAltitudePath() {
+    const svg = document.querySelector('.graph-svg');
+    const rect = svg.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const points = [];
+    const now = Date.now() / 1000;
+    
+    for (let i = 0; i <= width; i += 5) {
+        const x = i;
+        const y = height/2 + 
+                 Math.sin((i/width * 4 + now) * 2) * height/4 +
+                 Math.sin((i/width * 2 + now) * 3) * height/8;
+        points.push(`${x},${y}`);
+    }
+    
+    const linePath = `M${points.join(' L')}`;
+    document.getElementById('altitudePath').setAttribute('d', linePath);
+    
+    const fillPath = `${linePath} L${width},${height} L0,${height} Z`;
+    document.getElementById('altitudeFill').setAttribute('d', fillPath);
+}
+
+// Update functions
+function updateCompass(heading) {
+    compassMarks.style.transform = `translate(-50%, -50%) rotate(${-heading}deg)`;
+    document.querySelector('.compass-heading').textContent = `${Math.round(heading)}°`;
+}
+
+function updateSpeed(speed) {
+    const speedIndicator = document.querySelector('.speed-indicator');
+    const speedValue = document.querySelector('.speed-value');
+    speedIndicator.style.transform = `rotate(${speed * 2}deg)`;
+    speedValue.textContent = Math.round(speed);
+}
+
+function updateAltitude(altitude) {
+    const maxAltitude = 800;
+    const percentage = ((maxAltitude - altitude) / maxAltitude) * 100;
+    const marker = document.getElementById('altitudeMarker');
+    const display = document.getElementById('currentAltitude');
+    marker.style.top = `${percentage}%`;
+    display.textContent = `${Math.round(altitude)}m`;
+}
+
+// Function to generate random target values
+function updateTargets() {
+    targetHeading = (heading + Math.random() * 40 - 20 + 360) % 360;
+    targetSpeed = Math.max(0, Math.min(100, speed + Math.random() * 10 - 5));
+    targetAltitude = Math.max(0, Math.min(800, altitude + Math.random() * 40 - 20));
+}
+
+// Main animation loop
+function animate() {
+    // Smooth transitions for all values
+    heading += (targetHeading - heading) * 0.05;
+    speed += (targetSpeed - speed) * 0.05;
+    altitude += (targetAltitude - altitude) * 0.05;
+
+    // Update all displays
+    updateCompass(heading);
+    updateSpeed(speed);
+    updateAltitude(altitude);
+    generateAltitudePath();
+
+    // Request next frame
+    requestAnimationFrame(animate);
+}
+
+// Start the animation
+animate();
+
+// Periodically update target values
+setInterval(updateTargets, 2000);
+</script>
+</body>
+</html>
